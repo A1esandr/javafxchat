@@ -64,6 +64,7 @@ public class Controller implements Initializable{
             socket = new Socket(SERVER_IP, SERVER_PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            new Thread(this::resetSocketOnTimeout).start();
             Thread t = new Thread(() -> {
                 try {
                     while(true){
@@ -129,5 +130,18 @@ public class Controller implements Initializable{
         });
     }
 
-
+    private void resetSocketOnTimeout() {
+        try {
+            Thread.sleep(120000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (!authorized) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
