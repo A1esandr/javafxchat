@@ -58,6 +58,22 @@ public class ClientHandler {
                                         server.sendMsgByNick(userNick, message);
                                     }
                                 }
+                            } else if(msg.startsWith("/newNick")){
+                                if(msg.contains(" ")){
+                                    String[] parts = msg.split(" ");
+                                    if(parts.length > 1){
+                                        String newNick = parts[1];
+                                        Integer result = server.getAuthService().updateNick(nick, newNick);
+                                        if(result == 2){
+                                            sendMsg("Такой ник уже занят");
+                                        } else if(result == 1){
+                                            nick = newNick;
+                                            sendMsg("Ник обновлен");
+                                        } else {
+                                            sendMsg("Не удалось выполнить действие");
+                                        }
+                                    }
+                                }
                             }
                         } else {
                             server.broadcastMsg(nick + ": " + msg);

@@ -1,35 +1,51 @@
 package ru.jchat.core.server;
 
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.util.List;
 
 public class BaseAuthService implements AuthService {
-    private class Entry {
-        private String login;
-        private String pass;
-        private String nick;
-        public Entry(String login, String pass, String nick) {
-            this.login = login;
-            this.pass = pass;
-            this.nick = nick;
-        }
-    }
-    private ArrayList<Entry> entries;
+    private SQLiteJDBC sqLiteJDBC;
     @Override
     public void start() { }
     @Override
     public void stop() { }
-    public BaseAuthService() {
-        entries = new ArrayList<>();
-        entries.add(new Entry("login1", "pass1", "nick1"));
-        entries.add(new Entry("login2", "pass2", "nick2"));
-        entries.add(new Entry("login3", "pass3", "nick3"));
+    public BaseAuthService(SQLiteJDBC sqLiteJDBC) {
+        this.sqLiteJDBC = sqLiteJDBC;
     }
     @Override
     public String getNickByLoginPass(String login, String pass) {
-        for (Entry o : entries) {
-            if (o.login.equals(login) && o.pass.equals(pass)) return o.nick;
+        Connection c = sqLiteJDBC.getConnection();
+
+        List<String> passNick = sqLiteJDBC.getUserPassNick(c, login);
+
+        sqLiteJDBC.closeConnection(c);
+
+        if(passNick == null || passNick.size() != 2){
+            return null;
         }
+
+        if(passNick.get(0).equals(pass)){
+            return passNick.get(1);
+        }
+
         return null;
+    }
+
+    @Override
+    public synchronized Integer updateNick(String oldNick, String newNick){
+        Connection c = sqLiteJDBC.getConnection();
+
+        List<String> existed = sqLiteJDBC.getLoginByNick(c, newNick);
+
+        if(existed != null && existed.size() > 0){
+            return 2;
+        }
+
+        Integer updated = sqLiteJDBC.updateNick(c, oldNick, newNick);
+
+        sqLiteJDBC.closeConnection(c);
+
+        return updated;
     }
 }
 

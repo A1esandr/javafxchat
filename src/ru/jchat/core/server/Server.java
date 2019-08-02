@@ -9,6 +9,7 @@ public class Server {
     private ServerSocket server;
     private Vector<ClientHandler> clients;
     private AuthService authService;
+    private SQLiteJDBC sqLiteJDBC;
     public AuthService getAuthService() {
         return authService;
     }
@@ -17,7 +18,8 @@ public class Server {
         try {
             server = new ServerSocket(PORT);
             Socket socket = null;
-            authService = new BaseAuthService();
+            sqLiteJDBC = new SQLiteJDBC();
+            authService = new BaseAuthService(sqLiteJDBC);
             authService.start();
             clients = new Vector<>();
             while (true) {
