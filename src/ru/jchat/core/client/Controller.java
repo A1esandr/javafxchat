@@ -84,7 +84,9 @@ public class Controller implements Initializable{
                                     historyFileName = "history_" + parts[1] + ".txt";
                                 }
                             }
+                            textArea.appendText("Последние записи из локальной истории чата\n");
                             readHistory();
+                            textArea.appendText("Конец локальной истории чата\n");
                             break;
                         }
                         textArea.appendText(s + "\n");
