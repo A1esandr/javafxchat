@@ -32,7 +32,7 @@ public class ClientHandler {
                             if (newNick != null){
                                 if (!server.isNickBusy(newNick)){
                                     nick = newNick;
-                                    sendMsg("/authok");
+                                    sendMsg("/authok "+nick);
                                     server.subscribe(this);
                                     break;
                                 } else {
