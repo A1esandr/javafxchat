@@ -162,10 +162,8 @@ public class Controller implements Initializable{
     private void writeHistory(String line){
         if(historyFileName != null && line != null){
             int historySize = messages.size();
-            if(historySize == 0 || (historySize % 10) > 0){
-                messages.add(line);
-            } else {
-                messages.add(line);
+            messages.add(line);
+            if(historySize > 0 && (historySize % 10) == 0){
                 try (BufferedWriter writer = new BufferedWriter(new FileWriter(historyFileName, true))) {
                     for(int i = historySize - 10; i < historySize; i++){
                         writer.write(messages.get(i) + "\n");
