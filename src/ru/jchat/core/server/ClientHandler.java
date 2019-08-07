@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 public class ClientHandler {
     private Server server;
@@ -42,6 +43,10 @@ public class ClientHandler {
                                 sendMsg("Неверный логин/пароль");
                             }
                         }
+                    }
+                    List<String> history = server.getHistory();
+                    if(history.size() > 0){
+                        history.forEach(el -> sendMsg("/history"+el));
                     }
                     while(true){
                         String msg = in.readUTF();
