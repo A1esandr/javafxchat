@@ -3,11 +3,14 @@ package ru.jchat.core.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server {
     private ServerSocket server;
     private Vector<ClientHandler> clients;
+    private CopyOnWriteArrayList<String> messages;
     private AuthService authService;
     public AuthService getAuthService() {
         return authService;
@@ -20,6 +23,7 @@ public class Server {
             authService = new BaseAuthService();
             authService.start();
             clients = new Vector<>();
+            messages = new CopyOnWriteArrayList<>();
             while (true) {
                 System.out.println("Сервер ожидает подключения");
                 socket = server.accept();
@@ -48,6 +52,7 @@ public class Server {
         for (ClientHandler o : clients) {
             o.sendMsg(msg);
         }
+        messages.add(msg);
     }
     public synchronized void sendMsgByNick(String nick, String msg) {
         for (ClientHandler o : clients) {
@@ -61,5 +66,13 @@ public class Server {
     }
     public synchronized void subscribe(ClientHandler o) {
         clients.add(o);
+    }
+    public synchronized List<String> getHistory(){
+        int historySize = messages.size();
+        int offset = 0;
+        if (historySize > 100){
+            offset = historySize - 100;
+        }
+        return messages.subList(offset, historySize);
     }
 }

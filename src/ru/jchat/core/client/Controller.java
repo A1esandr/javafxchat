@@ -9,11 +9,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable{
@@ -33,6 +33,8 @@ public class Controller implements Initializable{
     private Socket socket;
     private DataOutputStream out;
     private DataInputStream in;
+    private String historyFileName;
+    private List<String> messages;
 
     final String SERVER_IP = "localhost";
     final int SERVER_PORT = 8189;
@@ -64,20 +66,32 @@ public class Controller implements Initializable{
             socket = new Socket(SERVER_IP, SERVER_PORT);
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            messages = new ArrayList<>();
             new Thread(this::resetSocketOnTimeout).start();
             Thread t = new Thread(() -> {
                 try {
                     while(true){
                         String s = in.readUTF();
-                        if (s.equals("/authok")){
+                        if (s.startsWith("/authok")){
                             setAuthorized(true);
+                            if(s.contains(" ")){
+                                String[] parts = s.split(" ");
+                                if(parts.length > 1){
+                                    historyFileName = "history_" + parts[1] + ".txt";
+                                }
+                            }
                             break;
                         }
                         textArea.appendText(s + "\n");
                     }
                     while (true) {
                         String s = in.readUTF();
-                        textArea.appendText(s + "\n");
+                        if (s.startsWith("/history")){
+                            textArea.appendText(s.substring(8) + "\n");
+                        } else {
+                            textArea.appendText(s + "\n");
+                            writeHistory(s);
+                        }
                     }
                 } catch (IOException e) {
                     showAlert("Сервер перестал отвечать");
@@ -141,6 +155,22 @@ public class Controller implements Initializable{
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void writeHistory(String line){
+        if(historyFileName != null && line != null){
+            int historySize = messages.size();
+            messages.add(line);
+            if(historySize > 0 && (historySize % 10) == 0){
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(historyFileName, true))) {
+                    for(int i = historySize - 10; i < historySize; i++){
+                        writer.write(messages.get(i) + "\n");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
