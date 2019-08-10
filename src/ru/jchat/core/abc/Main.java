@@ -24,7 +24,7 @@ public class Main {
         synchronized (mon) {
             try {
                 for (int i = 0; i < 5; i++) {
-                    while (currentLetter == 'B' || currentLetter == 'C') {
+                    while (currentLetter != 'A') {
                         mon.wait();
                     }
                     System.out.print("A");
@@ -41,7 +41,7 @@ public class Main {
         synchronized (mon) {
             try {
                 for (int i = 0; i < 5; i++) {
-                    while (currentLetter == 'A' || currentLetter == 'C') {
+                    while (currentLetter != 'B') {
                         mon.wait();
                     }
                     System.out.print("B");
@@ -58,7 +58,7 @@ public class Main {
         synchronized (mon) {
             try {
                 for (int i = 0; i < 5; i++) {
-                    while (currentLetter == 'A' || currentLetter == 'B') {
+                    while (currentLetter != 'C') {
                         mon.wait();
                     }
                     System.out.print("C");
