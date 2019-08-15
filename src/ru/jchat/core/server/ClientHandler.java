@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.logging.Logger;
 
 public class ClientHandler {
     private Server server;
@@ -11,6 +12,7 @@ public class ClientHandler {
     private DataInputStream in;
     private DataOutputStream out;
     private String nick;
+    private static final Logger LOGGER = Logger.getLogger(ClientHandler.class.getName());
 
     public String getNick() {
         return nick;
@@ -85,6 +87,7 @@ public class ClientHandler {
     public void sendMsg(String msg){
         try {
             out.writeUTF(msg);
+            LOGGER.info(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }

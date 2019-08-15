@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 public class Server {
     private ServerSocket server;
@@ -13,6 +14,7 @@ public class Server {
         return authService;
     }
     private final int PORT = 8189;
+    private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
     public Server() {
         try {
             server = new ServerSocket(PORT);
@@ -21,14 +23,14 @@ public class Server {
             authService.start();
             clients = new Vector<>();
             while (true) {
-                System.out.println("Сервер ожидает подключения");
+                LOGGER.info("Сервер ожидает подключения");
                 socket = server.accept();
-                System.out.println("Клиент подключился");
+                LOGGER.info("Клиент подключился");
                 new ClientHandler(this, socket);
                 if(socket.isClosed()) break;
             }
         } catch (IOException e) {
-            System.out.println("Ошибка при работе сервера");
+            LOGGER.severe("Ошибка при работе сервера");
         } finally {
             try {
                 server.close();
