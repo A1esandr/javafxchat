@@ -10,8 +10,8 @@ public class ExampleTwo {
             boolean one = false;
             boolean four = false;
             boolean other = false;
-            for(int i = 0; i < in.length; i++){
-                switch (in[i]) {
+            for(int el : in){
+                switch (el) {
                     case 1:
                         one = true;
                         break;
