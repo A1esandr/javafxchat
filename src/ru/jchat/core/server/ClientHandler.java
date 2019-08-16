@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class ClientHandler {
@@ -13,6 +15,7 @@ public class ClientHandler {
     private DataOutputStream out;
     private String nick;
     private static final Logger LOGGER = Logger.getLogger(ClientHandler.class.getName());
+    private List<String> stopWords = Arrays.asList("fuck","jerk","asshole");
 
     public String getNick() {
         return nick;
@@ -47,7 +50,8 @@ public class ClientHandler {
                     }
                     while(true){
                         String msg = in.readUTF();
-                        System.out.println(nick + ": " + msg);
+                        msg = checkStopWords(msg);
+                        LOGGER.info(nick + ": " + msg);
                         if (msg.startsWith("/")){
                             if (msg.equals("/end")){
                                 break;
@@ -87,9 +91,17 @@ public class ClientHandler {
     public void sendMsg(String msg){
         try {
             out.writeUTF(msg);
-            LOGGER.info(msg);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String checkStopWords(String msg){
+        for(String word : stopWords){
+            if(msg.contains(word)){
+                msg = msg.replaceAll(word, "");
+            }
+        }
+        return msg;
     }
 }
