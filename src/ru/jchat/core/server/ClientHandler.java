@@ -97,9 +97,11 @@ public class ClientHandler {
     }
 
     private String checkStopWords(String msg){
-        for(String word : stopWords){
-            if(msg.contains(word)){
-                msg = msg.replaceAll(word, "");
+        if(msg != null){
+            for(String word : stopWords){
+                if(msg.contains(word)){
+                    msg = msg.replaceAll(word, "");
+                }
             }
         }
         return msg;
